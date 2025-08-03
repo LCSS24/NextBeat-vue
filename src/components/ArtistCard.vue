@@ -9,6 +9,10 @@ const props = defineProps({
     type: Array,
     required: true,
   },
+  onAudioChange: { // Nouvelle prop
+    type: Function,
+    required: true
+  }
 });
 
 const likedArtists = useLikedArtists(); // Utilisation du composable pour les artistes likés
@@ -46,16 +50,18 @@ const previewUrl = ref(null);
 
 watch(artiste, async (newArtist) => {
   if (newArtist && newArtist.name) {
-    previewUrl.value = await fetchItunesPreview(newArtist.name);
+    const url = await fetchItunesPreview(newArtist.name);
+    previewUrl.value = url;
+    props.onAudioChange(url); // On envoie l'URL à App.vue
   } else {
     previewUrl.value = null;
+    props.onAudioChange(null);
   }
 });
 </script>
 
 <template>
   <div v-if="artiste" :key="artiste.id" class="card">
-    <audio v-if="previewUrl" :src="previewUrl" autoplay hidden loop></audio>
     <div class="mask"></div>
     <button
       class="star-button"
@@ -113,8 +119,8 @@ watch(artiste, async (newArtist) => {
 .star-button {
   position: absolute;
   border-radius: 50px;
-  height: 75px;
-  width: 75px;
+  height: 65px;
+  width: 65px;
   padding: 0;
   border: 0;
   cursor: pointer;
@@ -171,7 +177,6 @@ watch(artiste, async (newArtist) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 33%;
   height: 100%;
   overflow: hidden;
 

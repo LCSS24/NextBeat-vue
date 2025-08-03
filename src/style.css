@@ -225,7 +225,7 @@ main {
   justify-content: center;
   flex-wrap: wrap;
   width: 92%;
-  max-height: 85%;
+  height: 85%;
   gap: 3%;
   margin: 20px 0;
   overflow-y: scroll;

@@ -1,7 +1,7 @@
 <script setup>
 import { fetchFrenchRapArtists } from "./composable/fetch";
 import ArtistCard from "./components/ArtistCard.vue";
-import { ref, onMounted, computed, watch } from "vue";
+import { ref, onMounted, computed, watch, onUnmounted } from "vue";
 import { useLikedArtists } from "./composable/useLikedArtists";
 import LikedArtistCard from "./components/likedArtistCard.vue";
 
@@ -10,6 +10,45 @@ const likedArtists = useLikedArtists(); // Utilisation du composable pour les ar
 const search = ref("");
 const volumeOpen = ref(false);
 const filterFavorites = ref(false);
+const audioElement = ref(null);
+const currentAudioUrl = ref(null);
+const currentVolume = ref(80); // Valeur par défaut
+
+// Gestion du volume
+const handleVolumeChange = (e) => {
+  const newVolume = parseInt(e.target.value);
+  currentVolume.value = newVolume;
+  if (audioElement.value) {
+    audioElement.value.volume = newVolume / 100;
+  }
+};
+
+// Quand l'URL audio change
+const handleAudioUrlChange = (url) => {
+  currentAudioUrl.value = url;
+  
+  // Arrêter l'audio précédent s'il existe
+  if (audioElement.value) {
+    audioElement.value.pause();
+    audioElement.value = null;
+  }
+  
+  // Créer un nouvel élément audio si une URL est fournie
+  if (url) {
+    audioElement.value = new Audio(url);
+    audioElement.value.volume = currentVolume.value / 100;
+    audioElement.value.loop = true;
+    audioElement.value.play().catch(e => console.log("Autoplay blocked:", e));
+  }
+};
+
+// Nettoyage quand le composant est démonté
+onUnmounted(() => {
+  if (audioElement.value) {
+    audioElement.value.pause();
+  }
+});
+
 
 //Récupérer les artistes
 onMounted(async () => {
@@ -29,6 +68,7 @@ const filteredLikedArtists = computed(() => {
 </script>
 
 <template>
+<audio ref="audioElement" v-if="false"></audio>
   <header>
     <h1>Next Beat</h1>
     <nav>
@@ -37,16 +77,25 @@ const filteredLikedArtists = computed(() => {
         <li>A propos</li>
       </ul>
       <button class="volume-button" @click="volumeOpen = !volumeOpen">
-        <i class="fa-solid fa-volume-high"></i>
+        <i v-if="currentVolume >= 50" class="fa-solid fa-volume-high"></i>
+        <i v-else-if="currentVolume < 50 && currentVolume > 10" class="fa-solid fa-volume-low"></i>
+        <i v-else class="fa-solid fa-volume-xmark"></i>
       </button>
     </nav>
   </header>
   <div class="volume" v-show="volumeOpen">
-    <input type="range" class="slider" />
+    <input 
+      type="range" 
+      class="slider" 
+      min="0" 
+      max="100" 
+      :value="currentVolume"
+      @input="handleVolumeChange"
+    />
   </div>
   <main>
     <div class="cards-container">
-      <ArtistCard v-if="artistes.length" :artistes="artistes" />
+      <ArtistCard v-if="artistes.length" :artistes="artistes" :onAudioChange="handleAudioUrlChange" />
       <p v-else>Chargement...</p>
     </div>
     <div v-if="!artistes.length" class="loading">Chargement...</div>
