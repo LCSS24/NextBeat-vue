@@ -26,19 +26,19 @@ const handleVolumeChange = (e) => {
 // Quand l'URL audio change
 const handleAudioUrlChange = (url) => {
   currentAudioUrl.value = url;
-  
+
   // Arrêter l'audio précédent s'il existe
   if (audioElement.value) {
     audioElement.value.pause();
     audioElement.value = null;
   }
-  
+
   // Créer un nouvel élément audio si une URL est fournie
   if (url) {
     audioElement.value = new Audio(url);
     audioElement.value.volume = currentVolume.value / 100;
     audioElement.value.loop = true;
-    audioElement.value.play().catch(e => console.log("Autoplay blocked:", e));
+    audioElement.value.play().catch((e) => console.log("Autoplay blocked:", e));
   }
 };
 
@@ -48,7 +48,6 @@ onUnmounted(() => {
     audioElement.value.pause();
   }
 });
-
 
 //Récupérer les artistes
 onMounted(async () => {
@@ -68,7 +67,7 @@ const filteredLikedArtists = computed(() => {
 </script>
 
 <template>
-<audio ref="audioElement" v-if="false"></audio>
+  <audio ref="audioElement" v-if="false"></audio>
   <header>
     <h1>Next Beat</h1>
     <nav>
@@ -78,24 +77,32 @@ const filteredLikedArtists = computed(() => {
       </ul>
       <button class="volume-button" @click="volumeOpen = !volumeOpen">
         <i v-if="currentVolume >= 50" class="fa-solid fa-volume-high"></i>
-        <i v-else-if="currentVolume < 50 && currentVolume > 10" class="fa-solid fa-volume-low"></i>
+        <i
+          v-else-if="currentVolume < 50 && currentVolume > 10"
+          class="fa-solid fa-volume-low"
+        ></i>
         <i v-else class="fa-solid fa-volume-xmark"></i>
       </button>
     </nav>
   </header>
   <div class="volume" v-show="volumeOpen">
-    <input 
-      type="range" 
-      class="slider" 
-      min="0" 
-      max="100" 
+    <input
+      type="range"
+      class="slider"
+      min="0"
+      max="100"
       :value="currentVolume"
       @input="handleVolumeChange"
+      :style="`--value: ${currentVolume}%`"
     />
   </div>
   <main>
     <div class="cards-container">
-      <ArtistCard v-if="artistes.length" :artistes="artistes" :onAudioChange="handleAudioUrlChange" />
+      <ArtistCard
+        v-if="artistes.length"
+        :artistes="artistes"
+        :onAudioChange="handleAudioUrlChange"
+      />
       <p v-else>Chargement...</p>
     </div>
     <div v-if="!artistes.length" class="loading">Chargement...</div>

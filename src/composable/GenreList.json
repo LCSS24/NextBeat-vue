@@ -1,0 +1,5 @@
+[
+  { "name": "Rap Français", "query": "french rap" },
+  { "name": "Pop", "query": "pop" },
+  { "name": "Kpop", "query": "kpop" }
+]

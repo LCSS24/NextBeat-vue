@@ -108,23 +108,26 @@ header {
 .slider {
   appearance: none;
   -webkit-appearance: none;
-  width: 140px; /* hauteur initiale du container volume */
-  height: 10px; /* largeur initiale avant rotation */
-  background: #550c77;
+  width: 140px;
+  height: 10px;
   border-radius: 25px;
   outline: none;
   cursor: pointer;
   transform: rotate(-90deg);
-  margin: 0;
+  background: linear-gradient(
+    to right,
+    #6b39ea 0%,
+    #6b39ea var(--value),
+    #858585 var(--value),
+    #858585 100%
+  );
 }
-
 .slider::-webkit-slider-runnable-track {
   -webkit-appearance: none;
-  height: 8px; /* track plus visible */
+  height: 8px;
   border-radius: 50px;
-  background: #550c77;
+  background: transparent; /* on délègue tout au parent */
 }
-
 .slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
@@ -134,7 +137,9 @@ header {
   border-radius: 50%;
   border: none;
   cursor: pointer;
-  margin-top: -4px; /* ajuste si besoin */
+  margin-top: -4px;
+  position: relative;
+  z-index: 1;
 }
 
 main {
