@@ -1,5 +1,6 @@
-# Vue 3 + Vite
+# A FAIRE
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
-
-Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
+- Appel des artistes via API (au lieu d'un JSON local)
+- Afficher le nom du son en cours
+- Page de selection de genre avant page de swipe
+- Au click sur un artiste -> page de swipe albums
