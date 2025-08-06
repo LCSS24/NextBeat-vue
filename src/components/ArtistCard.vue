@@ -30,6 +30,8 @@ function handleLike(artiste, isFavorite) {
       id: artiste.id,
       favorite: isFavorite,
     });
+    localStorage.setItem("likedArtists", JSON.stringify(likedArtists.value));
+
   } else {
     console.log(`${artiste.name} est déjà dans les likes`);
   }

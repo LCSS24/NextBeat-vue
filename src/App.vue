@@ -52,7 +52,12 @@ onUnmounted(() => {
 //Récupérer les artistes
 onMounted(async () => {
   const data = await fetchFrenchRapArtists();
-  artistes.value = data;
+
+    // Récupère les IDs des artistes déjà likés
+  const likedArtistIds = likedArtists.value.map(a => a.id);
+  
+  // Filtre les artistes pour exclure ceux déjà likés
+  artistes.value = data.filter(artist => !likedArtistIds.includes(artist.id));
 });
 
 const show = ref(false); // Pour afficher/masquer la liste des artistes likés
