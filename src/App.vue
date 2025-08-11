@@ -12,12 +12,13 @@ const volumeOpen = ref(false);
 const filterFavorites = ref(false);
 const audioElement = ref(null);
 const currentAudioUrl = ref(null);
-const currentVolume = ref(80); // Valeur par défaut
+const currentVolume = ref(parseInt(localStorage.getItem("volume")) || 80); // Charge le volume depuis localStorage ou utilise 80 par défaut
 
 // Gestion du volume
 const handleVolumeChange = (e) => {
   const newVolume = parseInt(e.target.value);
   currentVolume.value = newVolume;
+  localStorage.setItem("volume", newVolume);
   if (audioElement.value) {
     audioElement.value.volume = newVolume / 100;
   }
@@ -25,20 +26,23 @@ const handleVolumeChange = (e) => {
 
 // Quand l'URL audio change
 const handleAudioUrlChange = (url) => {
-  currentAudioUrl.value = url;
-
-  // Arrêter l'audio précédent s'il existe
   if (audioElement.value) {
     audioElement.value.pause();
     audioElement.value = null;
   }
 
-  // Créer un nouvel élément audio si une URL est fournie
   if (url) {
-    audioElement.value = new Audio(url);
-    audioElement.value.volume = currentVolume.value / 100;
-    audioElement.value.loop = true;
-    audioElement.value.play().catch((e) => console.log("Autoplay blocked:", e));
+    const audio = new Audio();
+    audio.crossOrigin = "anonymous"; // Important!
+    audio.src = url;
+    audio.volume = currentVolume.value / 100;
+    audio.loop = true;
+
+    // Attendre que l'audio soit chargé avant de l'assigner
+    audio.addEventListener("canplaythrough", () => {
+      audioElement.value = audio;
+      audio.play().catch((e) => console.error("Playback error:", e));
+    });
   }
 };
 
@@ -53,11 +57,11 @@ onUnmounted(() => {
 onMounted(async () => {
   const data = await fetchFrenchRapArtists();
 
-    // Récupère les IDs des artistes déjà likés
-  const likedArtistIds = likedArtists.value.map(a => a.id);
-  
+  // Récupère les IDs des artistes déjà likés
+  const likedArtistIds = likedArtists.value.map((a) => a.id);
+
   // Filtre les artistes pour exclure ceux déjà likés
-  artistes.value = data.filter(artist => !likedArtistIds.includes(artist.id));
+  artistes.value = data.filter((artist) => !likedArtistIds.includes(artist.id));
 });
 
 const show = ref(false); // Pour afficher/masquer la liste des artistes likés
@@ -72,7 +76,7 @@ const filteredLikedArtists = computed(() => {
 </script>
 
 <template>
-  <audio ref="audioElement" v-if="false"></audio>
+  <audio :key="currentAudioUrl" ref="audioElement" v-if="false"></audio>
   <header>
     <h1>Next Beat</h1>
     <nav>
@@ -83,7 +87,7 @@ const filteredLikedArtists = computed(() => {
       <button class="volume-button" @click="volumeOpen = !volumeOpen">
         <i v-if="currentVolume >= 50" class="fa-solid fa-volume-high"></i>
         <i
-          v-else-if="currentVolume < 50 && currentVolume > 10"
+          v-else-if="currentVolume < 50 && currentVolume > 1"
           class="fa-solid fa-volume-low"
         ></i>
         <i v-else class="fa-solid fa-volume-xmark"></i>
@@ -107,6 +111,7 @@ const filteredLikedArtists = computed(() => {
         v-if="artistes.length"
         :artistes="artistes"
         :onAudioChange="handleAudioUrlChange"
+        :audioElement="audioElement"
       />
       <p v-else>Chargement...</p>
     </div>

@@ -59,5 +59,13 @@ export async function fetchItunesPreview(query) {
   }
 
   const random = Math.floor(Math.random() * tracksSansFt.length);
-  return tracksSansFt[random].previewUrl;
+  const actualsong = {
+    url: tracksSansFt[random].previewUrl,
+    trackName: tracksSansFt[random].trackName,
+    albumName: tracksSansFt[random].collectionName,
+  };
+  console.log(actualsong);
+  return actualsong;
+  // Utiliser notre backend comme proxy
+  return `http://localhost:3001/audio?url=${encodeURIComponent(originalUrl)}`;
 }
