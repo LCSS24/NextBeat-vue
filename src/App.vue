@@ -23,6 +23,37 @@ const handleVolumeChange = (e) => {
     audioElement.value.volume = newVolume / 100;
   }
 };
+const offset = ref(0);
+const isLoading = ref(false);
+const hasMore = ref(true);
+
+async function loadMoreArtists() {
+  if (isLoading.value || !hasMore.value) return;
+
+  try {
+    isLoading.value = true;
+    const newArtists = await fetchFrenchRapArtists(offset.value);
+
+    // Si on reçoit moins de 10 artistes, c'est qu'il n'y en a plus à charger
+    if (newArtists.length < 10) {
+      hasMore.value = false;
+    }
+
+    // Filtrer les artistes déjà likés
+    const likedArtistIds = likedArtists.value.map((a) => a.id);
+    const filteredNewArtists = newArtists.filter(
+      (artist) => !likedArtistIds.includes(artist.id)
+    );
+
+    // Ajouter les nouveaux artistes à la liste existante
+    artistes.value = [...artistes.value, ...filteredNewArtists];
+    offset.value += 10;
+  } catch (error) {
+    console.error("Erreur lors du chargement des artistes:", error);
+  } finally {
+    isLoading.value = false;
+  }
+}
 
 // Quand l'URL audio change
 const handleAudioUrlChange = (url) => {
@@ -55,13 +86,7 @@ onUnmounted(() => {
 
 //Récupérer les artistes
 onMounted(async () => {
-  const data = await fetchFrenchRapArtists();
-
-  // Récupère les IDs des artistes déjà likés
-  const likedArtistIds = likedArtists.value.map((a) => a.id);
-
-  // Filtre les artistes pour exclure ceux déjà likés
-  artistes.value = data.filter((artist) => !likedArtistIds.includes(artist.id));
+  await loadMoreArtists();
 });
 
 const show = ref(false); // Pour afficher/masquer la liste des artistes likés
@@ -73,6 +98,15 @@ const filteredLikedArtists = computed(() => {
     )
     .filter((artist) => !filterFavorites.value || artist.favorite);
 });
+
+watch(
+  () => artistes.value.length,
+  (newLength) => {
+    if (newLength < 5 && hasMore.value) {
+      loadMoreArtists();
+    }
+  }
+);
 </script>
 
 <template>
@@ -112,6 +146,7 @@ const filteredLikedArtists = computed(() => {
         :artistes="artistes"
         :onAudioChange="handleAudioUrlChange"
         :audioElement="audioElement"
+        @needMoreArtists="loadMoreArtists"
       />
       <p v-else>Chargement...</p>
     </div>

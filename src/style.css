@@ -279,10 +279,9 @@ footer {
   z-index: 100;
 }
 
-
 /* Responsive */
 
-@media (min-width: 375px) {
+@media (max-width: 375px) {
   body {
     height: 100%;
     width: 100%;
@@ -306,9 +305,7 @@ footer {
         button {
           padding: 0.3rem 0.6rem;
         }
-
       }
     }
   }
-
 }

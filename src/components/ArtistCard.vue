@@ -28,6 +28,7 @@ const artiste = computed(() => props.artistes[index.value]);
 const previewUrl = ref(null);
 const currentTrackName = ref(null);
 const currentAlbumName = ref(null);
+const emit = defineEmits(["needMoreArtists"]);
 
 watch(artiste, async (newArtist) => {
   if (newArtist && newArtist.name) {
@@ -61,17 +62,19 @@ const isAnimating = ref(false);
 const hoverState = ref("none"); // 'none', 'like', 'no-like'
 
 async function nextArtist() {
-  if (index.value < props.artistes.length - 1) {
-    // Si on n'est pas au dernier artiste, passer au suivant
+  if (index.value < props.artistes.length - 3) {
+    // Si on n'est pas près de la fin, passer simplement au suivant
     setTimeout(() => {
       index.value++;
     }, 300);
   } else {
-    // Si on est au dernier artiste, on ne fait rien car il n'y a plus d'artistes à afficher
-    console.log("Plus d'artistes disponibles");
+    // Si on approche de la fin, demander plus d'artistes
+    emit("needMoreArtists");
+    setTimeout(() => {
+      index.value++;
+    }, 300);
   }
 }
-
 function handleLike(artiste, isFavorite) {
   if (!likedArtists.value.find((a) => a.id === artiste.id)) {
     likedArtists.value.push({
