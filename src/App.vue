@@ -3,7 +3,7 @@ import { fetchFrenchRapArtists } from "./composable/fetch";
 import ArtistCard from "./components/ArtistCard.vue";
 import { ref, onMounted, computed, watch, onUnmounted } from "vue";
 import { useLikedArtists } from "./composable/useLikedArtists";
-import LikedArtistCard from "./components/likedArtistCard.vue";
+import LikedArtistCard from "./components/LikedArtistCard.vue";
 
 const artistes = ref([]);
 const likedArtists = useLikedArtists(); // Utilisation du composable pour les artistes likés
