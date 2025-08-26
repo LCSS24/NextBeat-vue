@@ -5,3 +5,5 @@
 - Gérer les artistes non likés (ne plus les rappeler via fetch ni rien)
 - Gérer dynamiquement la liste des artistes fetch dans le local storage
 - Refaire la modale "Artistes likés" avec plus de détails (Artiste, Albums sortis/triés (ex: 0/3 albums triés), ajout d'un badge ou trophée si tout les albums sont triés)
+- Couper la musique au clic sur un bouton
+- Infos album/track remplacées par icone muet si pas d'audio
